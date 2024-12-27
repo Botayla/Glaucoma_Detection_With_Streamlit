@@ -338,10 +338,11 @@ def visualize_metrics(metrics_dict, dataset_name):
     # Create bar plot
     metric_names = list(metrics_dict.keys())
     metric_values = list(metrics_dict.values())
+    metrics_df = pd.DataFrame(list(metrics_dict.items()), columns=["Metric", "Value"])
+    
+    st.subheader(f"{dataset_name} Metrics")
+    st.bar_chart(metrics_df.set_index("Metric")["Value"])
 
-    st.bar_chart(metric_names, metric_values, title = f"{dataset_name} Metrics")
-    st.write("X-axis: Metric Name")
-    st.write("Y-axis: Metric Value")
 
 # Evaluate on validation set
 val_accuracy, val_precision, val_recall, val_f1, val_auc = evaluate_model(validation_loader)
