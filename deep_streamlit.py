@@ -2,26 +2,18 @@
 import streamlit as st
 import torch
 import matplotlib.pyplot as plt
-from torchvision.datasets import ImageFolder
 from torchvision import transforms
 from torch.utils.data import DataLoader
 import os
 import numpy as np
 import cv2
 import pandas as pd
-import matplotlib.pyplot as plt
 from PIL import Image
-import torch
-from torchvision import transforms
-from torchvision.transforms.functional import to_pil_image
 import torch.nn as nn
 import torch.optim as optim
-from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from scipy import stats
-from tqdm.notebook import tqdm
 import warnings 
 warnings.filterwarnings("ignore")
 st.title("Glaucoma Detection With CNN")
@@ -76,11 +68,6 @@ train_transforms = transforms.Compose([
                            contrast=0.2,          # Adjust contrast randomly by ±20%
                            saturation=0.2,        # Adjust saturation randomly by ±20%
                            hue=0.1),              # Adjust hue randomly by ±10%
-    transforms.RandomAffine(degrees=0,            # Random affine transformation (rotation disabled)
-                            shear=10,             # Shear transformations up to 10 degrees
-                            scale=(0.8, 1.2)),    # Scale images between 80% to 120%
-    transforms.RandomPerspective(distortion_scale=0.2, p=0.5),  # Add perspective distortion
-    transforms.RandomResizedCrop(size=224, scale=(0.8, 1.0)),   # Random crop and resize
     transforms.ToTensor(),                        # Convert image to tensor
     transforms.Normalize(mean=[0.485, 0.456, 0.406],  # Normalize with ImageNet mean/std
                          std=[0.229, 0.224, 0.225])
@@ -107,8 +94,8 @@ for i, image_name in enumerate(images):
         st.image(img, caption=image_name, use_column_width=True)                                    # Create a subplot for each image
 
 df =  pd.read_csv("H:\data\glaucoma.csv")  # read csv file have the images and labels 
-st.markdown("The distribution of Classes :")
-st.write(df["Glaucoma"].value_counts())   # Distribution of diagnosis in our dataset: 0: Negative, 1: Positive
+# st.markdown("The distribution of Classes :")
+# st.write(df["Glaucoma"].value_counts())   # Distribution of diagnosis in our dataset: 0: Negative, 1: Positive
 # Plot Class Distribution
 plt.figure(figsize=(8, 6))
 df["Glaucoma"].value_counts().plot(kind="bar", color=["pink", "yellow"])
@@ -116,7 +103,7 @@ plt.xlabel("Class", fontsize=14)
 plt.ylabel("Number of Images", fontsize=14)
 plt.title("Class Distribution in Dataset", fontsize=16)
 plt.xticks(rotation=0)
-st.pyplot(plt)
+# st.pyplot(plt)
 all_images = []                              # empty list to have all images (train , validation ) in one list 
 #save all images 
 for filename in os.listdir(train_path):      # Looping through train folder to append images in all_images list
@@ -169,16 +156,16 @@ train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)           
 validation_loader = DataLoader(validation_dataset, batch_size=32, shuffle=False)        # DataLoader for the validation dataset
 test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)                    # DataLoader for the test dataset
 #Test the DataLoader
-for images, labels in train_loader:                  # Looping through a train loader 
-    st.write(f"Batch of images shape: {images.shape}")  # Print the shape of the images of the batch 
-    st.write(f"Batch of labels shape: {labels.shape}")  # Printing the shape of the labels of the images 
-    break                                            # exit after the first batch 
+# for images, labels in train_loader:                  # Looping through a train loader 
+#     #st.write(f"Batch of images shape: {images.shape}")  # Print the shape of the images of the batch 
+#     #st.write(f"Batch of labels shape: {labels.shape}")  # Printing the shape of the labels of the images 
+#     break                                            # exit after the first batch 
 #--------------------------------------------------------------------------------------------------------
-st.markdown('---')
-st.markdown("### model archeticture")
-st.write(model)
-st.markdown('---')
-st.markdown("### model training:")
+# st.markdown('---')
+# st.markdown("### model archeticture")
+# st.write(model)
+# st.markdown('---')
+# st.markdown("### model training:")
 train_losses = []
 train_accuracies = []
 validation_accuracies = []
@@ -222,11 +209,11 @@ for epoch in range(num_epochs):
     validation_losses.append(val_loss / len(validation_loader))
     validation_accuracies.append(val_accuracy)
     # Print Metrics
-    st.write(f"Epoch {epoch+1}/{num_epochs}")
-    st.write(f"Training - Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.4f}")  
+    # st.write(f"Epoch {epoch+1}/{num_epochs}")
+    # st.write(f"Training - Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.4f}")  
 #--------------------------------------------------------------------------------------------------------
 st.markdown('---')
-st.markdown("### model Validation:")
+# st.markdown("### model Validation:")
 model.eval()
 val_loss = 0.0
 correct_predictions = 0
@@ -241,10 +228,10 @@ with torch.no_grad():
         total_predictions += target.size(0)
 val_accuracy = correct_predictions / total_predictions
 # Print accuracy as a percentage
-st.write(f"Accuracy of Validation: {val_accuracy * 100:.2f}%")
+# st.write(f"Accuracy of Validation: {val_accuracy * 100:.2f}%")
 #--------------------------------------------------------------------------------------------------------
-st.markdown('---')
-st.markdown("### model testing:")
+# st.markdown('---')
+# st.markdown("### model testing:")
 model.eval()  # Set model to evaluation mode
 all_predictions = []
 all_labels = []
@@ -259,7 +246,7 @@ with torch.no_grad():
         correct_predictions += (predicted == labels).sum().item()
         total_predictions += labels.size(0)    
     test_accuracy = correct_predictions / total_predictions
-    st.write(f"Test Accuracy: {test_accuracy:.4f}")
+    # st.write(f"Test Accuracy: {test_accuracy:.4f}")
 #--------------------------------------------------------------------------------------------------------
 # Plotting the loss curves
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
@@ -278,18 +265,18 @@ ax2.set_xlabel("Epoch")
 ax2.set_ylabel("Accuracy")
 ax2.set_title("Accuracy Curves")
 ax2.legend()
-st.pyplot(fig)
+# st.pyplot(fig)
 # Compute confusion matrix
 #--------------------------------------------------------------------------------------------------------
 cm = confusion_matrix(all_labels, all_predictions)
 disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Normal", "Glaucoma"])
 #--------------------------------------------------------------------------------------------------------
 # Plot confusion matrix
-st.header("Confusion Matrix")
-st.write("This confusion matrix visualizes the performance")
+# st.header("Confusion Matrix")
+# st.write("This confusion matrix visualizes the performance")
 fig, ax = plt.subplots()
 disp.plot(cmap=plt.cm.Blues, values_format="d", ax=ax)
-st.pyplot(fig)
+# st.pyplot(fig)
 # Function to evaluate metrics
 def evaluate_metrics(y_true, y_pred_probs, y_pred_labels):
     # Convert to numpy arrays
@@ -300,11 +287,8 @@ def evaluate_metrics(y_true, y_pred_probs, y_pred_labels):
     accuracy = accuracy_score(y_true, y_pred_labels)
     precision = precision_score(y_true, y_pred_labels)
     recall = recall_score(y_true, y_pred_labels)
-    f1 = f1_score(y_true, y_pred_labels)
-    auc = roc_auc_score(y_true, y_pred_probs)   
-    # Chi-square statistic
-    #chi_square = np.sum(((y_true - y_pred_probs) ** 2) / (y_true + 1e-10))  # Avoid division by zero    
-    return accuracy, precision, recall, f1, auc
+    f1 = f1_score(y_true, y_pred_labels)    
+    return accuracy, precision, recall, f1
 # Function to evaluate the model on a DataLoader
 def evaluate_model(dataloader):
     model.eval()
@@ -314,7 +298,6 @@ def evaluate_model(dataloader):
     with torch.no_grad():
         for images, labels in dataloader:
             outputs = model(images)
-            
             # Convert logits to probabilities (softmax output)
             probabilities = torch.nn.functional.softmax(outputs, dim=1)[:, 1].cpu().numpy()  # Probability of class 1
             predictions = (probabilities > 0.5).astype(int)  # Convert probabilities to binary class labels (0 or 1)
@@ -324,8 +307,8 @@ def evaluate_model(dataloader):
             all_pred_probs.extend(probabilities)  # Predicted probabilities
 
     # Evaluate metrics
-    accuracy, precision, recall, f1, auc = evaluate_metrics(np.array(all_labels), np.array(all_pred_probs), np.array(all_predictions))
-    return accuracy, precision, recall, f1, auc 
+    accuracy, precision, recall, f1= evaluate_metrics(np.array(all_labels), np.array(all_pred_probs), np.array(all_predictions))
+    return accuracy, precision, recall, f1
 
 # Function to visualize the metrics
 def visualize_metrics(metrics_dict, dataset_name):
@@ -340,41 +323,39 @@ def visualize_metrics(metrics_dict, dataset_name):
     metric_values = list(metrics_dict.values())
     metrics_df = pd.DataFrame(list(metrics_dict.items()), columns=["Metric", "Value"])
     
-    st.subheader(f"{dataset_name} Metrics")
-    st.bar_chart(metrics_df.set_index("Metric")["Value"])
+    # st.subheader(f"{dataset_name} Metrics")
+    # st.bar_chart(metrics_df.set_index("Metric")["Value"])
 
 
 # Evaluate on validation set
-val_accuracy, val_precision, val_recall, val_f1, val_auc = evaluate_model(validation_loader)
+val_accuracy, val_precision, val_recall, val_f1 = evaluate_model(validation_loader)
 validation_metrics = {
     "Accuracy": val_accuracy,
     "Precision": val_precision,
     "Recall": val_recall,
-    "F1-Score": val_f1,
-    "AUC": val_auc
+    "F1-Score": val_f1
 }
 
 # Print validation metrics
-st.write("Validation Metrics:")
-st.write(f"Accuracy: {val_accuracy:.4f}, Precision: {val_precision:.4f}, Recall: {val_recall:.4f}, F1-Score: {val_f1:.4f}, AUC: {val_auc:.4f}")
+# st.write("Validation Metrics:")
+# st.write(f"Accuracy: {val_accuracy:.4f}, Precision: {val_precision:.4f}, Recall: {val_recall:.4f}, F1-Score: {val_f1:.4f}
 
 # Visualize validation metrics
 visualize_metrics(validation_metrics, "Validation")
 
 # Evaluate on test set
-test_accuracy, test_precision, test_recall, test_f1, test_auc = evaluate_model(test_loader)
+test_accuracy, test_precision, test_recall, test_f1 = evaluate_model(test_loader)
 test_metrics = {
     "Accuracy": test_accuracy,
     "Precision": test_precision,
     "Recall": test_recall,
-    "F1-Score": test_f1,
-    "AUC": test_auc,
+    "F1-Score": test_f1
     
 }
 
 # Print test metrics
-st.write("\nTest Metrics:")
-st.write(f"Accuracy: {test_accuracy:.4f}, Precision: {test_precision:.4f}, Recall: {test_recall:.4f}, F1-Score: {test_f1:.4f}, AUC: {test_auc:.4f}")
+# st.write("\nTest Metrics:")
+# st.write(f"Accuracy: {test_accuracy:.4f}, Precision: {test_precision:.4f}, Recall: {test_recall:.4f}, F1-Score: {test_f1:.4f})
 
 # Visualize test metrics
 visualize_metrics(test_metrics, "Test")
